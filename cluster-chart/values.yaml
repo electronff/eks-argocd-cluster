@@ -1,0 +1,14 @@
+dashboard:
+  enabled: true
+  repoURL: https://kubernetes.github.io/dashboard/
+  targetRevision: 3.0.0
+  chart: kubernetes-dashboard
+  fullnameOverride: kubernetes-dashboard
+  rbac:
+    clusterReadOnlyRole: true
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

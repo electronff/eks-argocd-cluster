@@ -1,0 +1,36 @@
+{{- if .Values.dashboard.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{if .Values.applicationName }}{{ .Values.applicationName }}-{{end}}dashboard
+  namespace: argocd
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: kube-system
+    server: {{ .Values.cluster }}
+  project: {{ .Values.project }}
+  source:
+    chart: {{ .Values.dashboard.chart }}
+    helm:
+      parameters:
+      - name:  fullnameOverride
+        value: {{ .Values.dashboard.fullnameOverride }}
+      - name: rbac.clusterReadOnlyRole
+        value: {{ .Values.dashboard.rbac.clusterReadOnlyRole | quote }}
+      valueFiles:
+      - values.yaml
+{{- if .Values.dashboard.additionalValues }}
+      values: |-
+{{ toYaml .Values.dashboard.additionalValues  | indent 8}}
+{{- end }}
+    repoURL: {{ .Values.dashboard.repoURL }}
+    targetRevision: {{ .Values.dashboard.targetRevision }}
+  syncPolicy:
+{{ toYaml .Values.dashboard.syncPolicy | indent 4 }}
+{{- end }}
